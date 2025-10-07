@@ -1,0 +1,34 @@
+{
+  "manifest_version": 3,
+  "name": "Malt to CV",
+  "version": "1.0",
+  "description": "Transforme ton profil Malt en CV PDF personnalisé",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://www.malt.fr/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Malt to CV"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.malt.fr/profile/*"],
+      "js": ["config.js", "content.js"],
+      "css": ["content.css"]
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["templates/*"],
+      "matches": ["https://www.malt.fr/*"]
+    }
+  ]
+}

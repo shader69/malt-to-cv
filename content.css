@@ -1,0 +1,106 @@
+
+
+/*********************************************
+Style général pour l'export 
+************************************************/
+
+.malt-to-cv-export {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+  line-height: 1.6 !important;
+  color: #333 !important;
+  background: white !important;
+  padding: 20px !important;
+}
+
+/* Réorganiser la mise en page du profil */
+.malt-to-cv-export .profile-wrapper__content {
+  flex-direction: column !important;
+}
+.malt-to-cv-export .profile-wrapper__side-menu {
+  min-width: none !important;
+  max-width: none !important;
+}
+.malt-to-cv-export .profile-wrapper__profile-sidemenu {
+  display: flex !important;
+}
+.malt-to-cv-export .profile-wrapper__profile-sidemenu section {
+  margin: calc(4px * 8);
+}
+.malt-to-cv-export .profile-wrapper__profile-sidemenu section:first-child {
+  margin-left: 0 !important;
+}
+.malt-to-cv-export .profile-wrapper__profile-sidemenu section:last-child {
+  margin-right: 0 !important;
+}
+
+.malt-to-cv-export h1, 
+.malt-to-cv-export h2, 
+.malt-to-cv-export h3 {
+  color: #2c3e50 !important;
+  margin-bottom: 10px !important;
+}
+
+.malt-to-cv-export .profile-header {
+  border-bottom: 2px solid #3498db !important;
+  padding-bottom: 20px !important;
+  margin-bottom: 30px !important;
+}
+
+.malt-to-cv-export .section {
+  margin-bottom: 25px !important;
+}
+
+.malt-to-cv-export .section h3 {
+  color: #34495e !important;
+  border-bottom: 1px solid #bdc3c7 !important;
+  padding-bottom: 5px !important;
+}
+
+/* Optimiser pour l'impression */
+@media print {
+  .malt-to-cv-export {
+    margin: 0 !important;
+    padding: 20px !important;
+  }
+  
+  .malt-to-cv-export * {
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+}
+
+/*********************************************
+Masquer TOUJOURS certaines sections 
+************************************************/
+
+/* Header avec encart bleu qui bug */
+.malt-to-cv-export .profile-wrapper__profile .profile-wrapper__profile-breadcrumb.freelancer .shapes.freelancer,
+
+/* Header : "Taux de réponse" */
+.malt-to-cv-export ul.profile-indicators li.profile-indicators-item[data-testid*="answer-rate-indicator"],
+
+/* "Vérifications" */
+.malt-to-cv-export .joy-panel:has([data-testid*="verification"]),
+.malt-to-cv-export .joy-panel:has(.verification),
+.malt-to-cv-export .joy-panel:has([class*="verification"]),
+
+/* "Ces profils correspondent aussi à votre recherche" */
+.malt-to-cv-export .joy-panel:has([data-testid*="similar"]),
+.malt-to-cv-export .joy-panel:has(.similar),
+.malt-to-cv-export .joy-panel:has([class*="similar"]),
+
+/* Boutons d'extension des sections (après avoir cliqué dessus) */
+.malt-to-cv-export section[data-testid*="profile-main-skill-set-section"] .profile-show-more-or-less, /* "Compétences" */
+.malt-to-cv-export section[data-testid*="profile-description"] .read-more__link,                      /* "Description" */
+.malt-to-cv-export section[data-testid*="profile-experience-section"] .profile-show-more-or-less,     /* "Expériences" */
+.malt-to-cv-export section#appraisalSection .read-more__link,                                         /* "Avis Malt" */
+.malt-to-cv-export section[data-testid*="recommendation-sections"] .profile-show-more-or-less,        /* "Recommandations externes" */
+.malt-to-cv-export section .read-more__link:has(#education-section),                                  /* "Formations" */
+
+/* Boutons cta */
+.malt-to-cv-export [class*="cta"],
+
+/* Navbar */
+.malt-to-cv-export #navbar-app {
+  display: none !important;
+}
