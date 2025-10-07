@@ -41,6 +41,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     Object.assign(options, savedOptions.maltToCvOptions);
     updateUI();
   }
+  
+  // Appliquer la surbrillance dès l'ouverture
+  updateHighlighting();
 });
 
 // Mettre à jour l'interface selon les options
@@ -99,6 +102,8 @@ function attachEventListeners() {
         options[config.key] = e.target.checked;
         updateExpandOptions();
         saveOptions();
+        // Mettre à jour la surbrillance
+        updateHighlighting();
       });
     }
   });
@@ -110,9 +115,55 @@ function attachEventListeners() {
       element.addEventListener('change', (e) => {
         options[config.key] = e.target.checked;
         saveOptions();
+        // Mettre à jour la surbrillance
+        updateHighlighting();
       });
     }
   });
+}
+
+// Fonction pour surligner les éléments sur la page
+async function highlightElements(selector) {
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (tab.url.includes('malt.fr/profile/')) {
+      await chrome.tabs.sendMessage(tab.id, {
+        action: 'highlightElements',
+        selector: selector
+      });
+    }
+  } catch (error) {
+    // Erreur silencieuse
+  }
+}
+
+// Fonction pour retirer la surbrillance
+async function removeHighlighting() {
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (tab.url.includes('malt.fr/profile/')) {
+      await chrome.tabs.sendMessage(tab.id, {
+        action: 'removeHighlighting'
+      });
+    }
+  } catch (error) {
+    // Erreur silencieuse
+  }
+}
+
+// Fonction pour mettre à jour la surbrillance selon les options cochées
+async function updateHighlighting() {
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (tab.url.includes('malt.fr/profile/')) {
+      await chrome.tabs.sendMessage(tab.id, {
+        action: 'updateHighlighting',
+        options: options
+      });
+    }
+  } catch (error) {
+    // Erreur silencieuse
+  }
 }
 
 // Fonction pour afficher le statut

@@ -104,3 +104,23 @@ Masquer TOUJOURS certaines sections
 .malt-to-cv-export #navbar-app {
   display: none !important;
 }
+
+/*********************************************
+Surbrillance des éléments à masquer
+************************************************/
+
+/* Style pour la surbrillance des éléments à masquer */
+.highlight-to-hide {
+  background-color: rgba(255, 99, 99, 0.2) !important;
+  border: 2px solid rgba(255, 99, 99, 0.6) !important;
+  border-radius: 4px !important;
+  box-shadow: 0 0 10px rgba(255, 99, 99, 0.3) !important;
+}
+
+/* Style pour la surbrillance des éléments à étendre */
+.highlight-to-expand {
+  background-color: rgba(99, 255, 99, 0.2) !important;
+  border: 2px solid rgba(99, 255, 99, 0.6) !important;
+  border-radius: 4px !important;
+  box-shadow: 0 0 10px rgba(99, 255, 99, 0.3) !important;
+}

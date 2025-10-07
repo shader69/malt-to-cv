@@ -9,6 +9,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'generatePDF') {
     generatePDF(message.options);
   }
+  
+  if (message.action === 'highlightElements') {
+    highlightElementsOnPage(message.selector);
+  }
+  
+  if (message.action === 'removeHighlighting') {
+    removeHighlightingFromPage();
+  }
+  
+  if (message.action === 'updateHighlighting') {
+    updateHighlightingOnPage(message.options);
+  }
 });
 
 // Fonction pour détecter si le profil est accessible
@@ -127,6 +139,9 @@ function cleanup() {
   
   // Restaurer tous les éléments masqués via les options
   restoreHiddenElements();
+  
+  // Retirer toute la surbrillance
+  removeHighlightingFromPage();
 }
 
 // Fonction générique pour restaurer les éléments masqués
@@ -138,5 +153,84 @@ function restoreHiddenElements() {
     elements.forEach(el => {
       el.style.display = '';
     });
+  });
+}
+
+// Fonction pour surligner les éléments sur la page
+function highlightElementsOnPage(selector) {
+  // Retirer d'abord toute surbrillance existante
+  removeHighlightingFromPage();
+  
+  try {
+    const elements = document.querySelectorAll(selector);
+    elements.forEach(el => {
+      el.classList.add('highlight-to-hide');
+    });
+  } catch (error) {
+    // Erreur silencieuse
+  }
+}
+
+// Fonction pour retirer la surbrillance de la page
+function removeHighlightingFromPage() {
+  const highlightedElements = document.querySelectorAll('.highlight-to-hide, .highlight-to-expand');
+  highlightedElements.forEach(el => {
+    el.classList.remove('highlight-to-hide');
+    el.classList.remove('highlight-to-expand');
+  });
+}
+
+// Fonction pour mettre à jour la surbrillance selon les options
+function updateHighlightingOnPage(options) {
+  // Retirer toute surbrillance existante
+  removeHighlightingFromPage();
+  
+  // Appliquer la surbrillance rouge pour les options cochées (masquage)
+  OPTIONS_CONFIG.forEach(config => {
+    if (options[config.key]) {
+      try {
+        const elements = document.querySelectorAll(config.selector);
+        elements.forEach(el => {
+          el.classList.add('highlight-to-hide');
+        });
+      } catch (error) {
+        // Erreur silencieuse
+      }
+    }
+  });
+  
+  // Appliquer la surbrillance verte pour les sections qui seront étendues
+  highlightExpandableSections(options);
+}
+
+// Fonction pour surligner les sections qui vont être étendues
+function highlightExpandableSections(options) {
+  // Toujours surligner les sections ALWAYS_EXPAND_SELECTORS
+  ALWAYS_EXPAND_SELECTORS.forEach(config => {
+    try {
+      const elements = document.querySelectorAll(config.selector);
+      elements.forEach(el => {
+        el.classList.add('highlight-to-expand');
+      });
+    } catch (error) {
+      // Erreur silencieuse
+    }
+  });
+  
+  // Surligner conditionnellement selon les options d'expansion
+  EXPANSION_CONFIG.forEach(config => {
+    const shouldExpand = options[config.key];
+    const isNotHidden = !config.dependsOn || !options[config.dependsOn];
+    
+    if (shouldExpand && isNotHidden) {
+      try {
+        const elements = document.querySelectorAll(config.selector);
+        elements.forEach(el => {
+          el.classList.add('highlight-to-expand');
+        });
+      } catch (error) {
+        // Erreur silencieuse
+      }
+    }
   });
 }
