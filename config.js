@@ -5,32 +5,38 @@ window.OPTIONS_CONFIG = [
   {
     key: 'hideTJM',
     title: 'Masquer le TJM',
-    selector: 'ul.profile-indicators li.profile-indicators-item:has([data-testid*="profile-price"])'
+    selector: 'ul.profile-indicators li.profile-indicators-item:has([data-testid*="profile-price"])',
+    defaultValue: false
   },
   {
     key: 'hideLocation',
     title: 'Masquer la localisation',
-    selector: '.profile-wrapper__profile-sidemenu section:has(.profile__location-and-workplace-preferences__wrapper)'
+    selector: '.profile-wrapper__profile-sidemenu section:has(.profile__location-and-workplace-preferences__wrapper)',
+    defaultValue: false
   },
   {
     key: 'hideAvailability',
     title: 'Masquer la disponibilité',
-    selector: '[data-testid*="availability"], .availability, [class*="availability"]'
+    selector: '.joy-wrapper .joy-availability',
+    defaultValue: true
   },
   {
     key: 'hideOtherSkills',
     title: 'Masquer les autres compétences',
-    selector: '[data-testid="profile-main-skill-set"] > div:has([data-testid="profile-main-skill-set-selected-skills-list"])'
+    selector: '[data-testid="profile-main-skill-set"] > div:has([data-testid="profile-main-skill-set-selected-skills-list"])',
+    defaultValue: false
   },
   {
     key: 'hideMaltReviews',
     title: 'Masquer les avis clients Malt',
-    selector: 'section#appraisalSection [data-testid="read-more-component-content"]'
+    selector: 'section#appraisalSection [data-testid="read-more-component-content"]',
+    defaultValue: false
   },
   {
     key: 'hideRecommendations',
     title: 'Masquer les recommandations',
-    selector: 'section#recommendationSection ul.recommendations-list'
+    selector: 'section#recommendationSection ul.recommendations-list',
+    defaultValue: false
   }
 ];
 
@@ -40,19 +46,22 @@ window.EXPANSION_CONFIG = [
     key: 'expandOtherSkills',
     title: 'Étendre les compétences',
     selector: 'section[data-testid*="profile-main-skill-set-section"] .profile-show-more-or-less button',
-    dependsOn: 'hideOtherSkills'
+    dependsOn: 'hideOtherSkills',
+    defaultValue: true
   },
   {
     key: 'expandMaltReviews',
     title: 'Étendre les avis Malt',
     selector: 'section#appraisalSection .read-more__link button',
-    dependsOn: 'hideMaltReviews'
+    dependsOn: 'hideMaltReviews',
+    defaultValue: true
   },
   {
     key: 'expandRecommendations',
     title: 'Étendre les recommandations',
     selector: 'section[data-testid*="recommendation-sections"] .profile-show-more-or-less button',
-    dependsOn: 'hideRecommendations'
+    dependsOn: 'hideRecommendations',
+    defaultValue: true
   }
 ];
 
@@ -72,15 +81,8 @@ window.ALWAYS_EXPAND_SELECTORS = [
   }
 ];
 
-// Options par défaut
-window.DEFAULT_OPTIONS = {
-  hideTJM: false,
-  hideLocation: false,
-  hideAvailability: true,
-  hideOtherSkills: false,
-  hideMaltReviews: false,
-  hideRecommendations: false,
-  expandOtherSkills: true,
-  expandMaltReviews: true,
-  expandRecommendations: true
-};
+// Génération automatique des options par défaut à partir de la config
+window.DEFAULT_OPTIONS = {};
+[...window.OPTIONS_CONFIG, ...window.EXPANSION_CONFIG].forEach(option => {
+  window.DEFAULT_OPTIONS[option.key] = option.defaultValue;
+});

@@ -50,7 +50,8 @@ window.OPTIONS_CONFIG = [
   {
     key: 'hideTJM',
     title: 'Masquer le TJM',
-    selector: 'ul.profile-indicators li.profile-indicators-item:has([data-testid*="profile-price"])'
+    selector: 'ul.profile-indicators li.profile-indicators-item:has([data-testid*="profile-price"])',
+    defaultValue: false
   },
   // ... autres options
 ];
@@ -61,7 +62,8 @@ window.EXPANSION_CONFIG = [
     key: 'expandOtherSkills',
     title: 'Étendre les compétences',
     selector: 'section[data-testid*="profile-main-skill-set-section"] .profile-show-more-or-less button',
-    dependsOn: 'hideOtherSkills'
+    dependsOn: 'hideOtherSkills',
+    defaultValue: true
   },
   // ... autres options
 ];
@@ -95,7 +97,8 @@ window.EXPANSION_CONFIG = [
 {
   key: 'hideNewOption',
   title: 'Masquer nouvelle option',
-  selector: 'nouveau-selector-css'
+  selector: 'nouveau-selector-css',
+  defaultValue: false  // Valeur par défaut
 }
 
 // Dans EXPANSION_CONFIG (si applicable)
@@ -103,7 +106,8 @@ window.EXPANSION_CONFIG = [
   key: 'expandNewOption',
   title: 'Étendre nouvelle option',
   selector: 'nouveau-selector-button',
-  dependsOn: 'hideNewOption'
+  dependsOn: 'hideNewOption',
+  defaultValue: true  // Valeur par défaut
 }
 ```
 
