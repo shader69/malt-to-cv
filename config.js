@@ -55,6 +55,35 @@ window.SECTIONS_CONFIG = [
     ]
   },
   {
+    title: "Corps principal",
+    options: [
+      {
+        key: 'expandDescription',
+        type: 'expand',
+        title: 'Étendre la description',
+        selector: 'section[data-testid*="profile-description"] .read-more__link button',
+        defaultValue: true,
+        hidden: true
+      },
+      {
+        key: 'expandExperiences',
+        type: 'expand',
+        title: 'Étendre les expériences',
+        selector: 'section[data-testid*="profile-experience-section"] .profile-show-more-or-less button',
+        defaultValue: true,
+        hidden: true
+      },
+      {
+        key: 'expandFormations',
+        type: 'expand',
+        title: 'Étendre les formations',
+        selector: 'section .read-more__link:has(#education-section) button',
+        defaultValue: true,
+        hidden: true
+      }
+    ]
+  },
+  {
     title: "🎯 Compétences",
     options: [
       {
@@ -108,22 +137,6 @@ window.SECTIONS_CONFIG = [
         defaultValue: true
       }
     ]
-  }
-];
-
-// Configuration des sections toujours déployées
-window.ALWAYS_EXPAND_SELECTORS = [
-  {
-    title: 'Description',
-    selector: 'section[data-testid*="profile-description"] .read-more__link button'
-  },
-  {
-    title: 'Expériences',
-    selector: 'section[data-testid*="profile-experience-section"] .profile-show-more-or-less button'
-  },
-  {
-    title: 'Formations',
-    selector: 'section .read-more__link:has(#education-section) button'
   }
 ];
 

@@ -6,6 +6,14 @@ function generateInterface() {
   const optionsContainer = document.getElementById('optionsContainer');
   
   SECTIONS_CONFIG.forEach(section => {
+    // Filtrer les options visibles (non cachées)
+    const visibleOptions = section.options.filter(opt => !opt.hidden);
+    
+    // Si la section n'a aucune option visible, ne pas l'afficher
+    if (visibleOptions.length === 0) {
+      return;
+    }
+    
     // Créer une section
     const sectionDiv = document.createElement('div');
     sectionDiv.className = 'option-group';
@@ -19,8 +27,8 @@ function generateInterface() {
     const checkboxGroup = document.createElement('div');
     checkboxGroup.className = 'checkbox-group';
     
-    // Ajouter les options de la section
-    section.options.forEach(config => {
+    // Ajouter les options visibles de la section
+    visibleOptions.forEach(config => {
       const checkboxItem = document.createElement('div');
       checkboxItem.className = 'checkbox-item';
       checkboxItem.innerHTML = `

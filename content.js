@@ -70,13 +70,7 @@ async function generatePDF(options) {
 function expandSections(options) {
   console.log('📖 Déploiement des sections selon les options:', options);
   
-  // Toujours déployer les sections définies dans ALWAYS_EXPAND_SELECTORS
-  ALWAYS_EXPAND_SELECTORS.forEach(config => {
-    const buttons = document.querySelectorAll(config.selector);
-    buttons.forEach(button => button.click());
-  });
-  
-  // Déployer conditionnellement selon les options
+  // Déployer toutes les sections d'expansion selon les options
   SECTIONS_CONFIG.forEach(section => {
     section.options.forEach(config => {
       // Ne traiter que les options d'expansion
@@ -221,19 +215,7 @@ function updateHighlightingOnPage(options) {
 
 // Fonction pour surligner les sections qui vont être étendues
 function highlightExpandableSections(options) {
-  // Toujours surligner les sections ALWAYS_EXPAND_SELECTORS
-  ALWAYS_EXPAND_SELECTORS.forEach(config => {
-    try {
-      const elements = document.querySelectorAll(config.selector);
-      elements.forEach(el => {
-        el.classList.add('highlight-to-expand');
-      });
-    } catch (error) {
-      // Erreur silencieuse
-    }
-  });
-  
-  // Surligner conditionnellement selon les options d'expansion
+  // Surligner toutes les sections d'expansion selon les options
   SECTIONS_CONFIG.forEach(section => {
     section.options.forEach(config => {
       // Ne traiter que les options d'expansion
