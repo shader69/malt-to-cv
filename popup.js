@@ -45,7 +45,45 @@ function generateInterface() {
 
 // Charger les options sauvegardées
 document.addEventListener('DOMContentLoaded', async () => {
-  // Générer l'interface d'abord
+  // Vérifier qu'on est sur un profil Malt avec ?overview AVANT de générer l'interface
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  
+  if (!tab.url.includes('malt.fr/profile/')) {
+    showStatus('❌ Veuillez ouvrir un profil Malt d\'abord', 'error');
+    document.getElementById('optionsContainer').style.display = 'none';
+    document.getElementById('generateBtn').style.display = 'none';
+    
+    // Afficher le bouton pour aller au profil
+    const actionBtn = document.createElement('button');
+    actionBtn.className = 'action-btn';
+    actionBtn.textContent = '👤 Aller à mon profil';
+    actionBtn.addEventListener('click', () => {
+      chrome.tabs.update(tab.id, { url: 'https://www.malt.fr/profile' });
+      window.close();
+    });
+    document.getElementById('actionBtnContainer').appendChild(actionBtn);
+    return;
+  }
+  
+  if (!tab.url.endsWith('?overview')) {
+    showStatus('❌ Veuillez cliquer sur "Voir mon profil en tant que client"', 'error');
+    document.getElementById('optionsContainer').style.display = 'none';
+    document.getElementById('generateBtn').style.display = 'none';
+    
+    // Afficher le bouton pour voir en tant que client
+    const actionBtn = document.createElement('button');
+    actionBtn.className = 'action-btn';
+    actionBtn.textContent = '👁️ Voir en tant que client';
+    actionBtn.addEventListener('click', () => {
+      const newUrl = tab.url + '?overview';
+      chrome.tabs.update(tab.id, { url: newUrl });
+      window.close();
+    });
+    document.getElementById('actionBtnContainer').appendChild(actionBtn);
+    return;
+  }
+  
+  // Tout est bon, on peut générer l'interface
   generateInterface();
   
   // Attacher les gestionnaires d'événements
@@ -225,13 +263,8 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
     generateBtn.disabled = true;
     generateBtn.textContent = '⏳ Génération...';
     
-    // Vérifier qu'on est sur un profil Malt
+    // Récupérer l'onglet actif
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    
-    if (!tab.url.includes('malt.fr/profile/')) {
-      showStatus('❌ Veuillez ouvrir un profil Malt d\'abord', 'error');
-      return;
-    }
     
     // S'assurer que le content script est chargé
     const isLoaded = await ensureContentScriptLoaded(tab.id);
