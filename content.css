@@ -76,19 +76,6 @@ Masquer TOUJOURS certaines sections
 /* Header avec encart bleu qui bug */
 .malt-to-cv-export .profile-wrapper__profile .profile-wrapper__profile-breadcrumb.freelancer .shapes.freelancer,
 
-/* Header : "Taux de réponse" */
-.malt-to-cv-export ul.profile-indicators li.profile-indicators-item[data-testid*="answer-rate-indicator"],
-
-/* "Vérifications" */
-.malt-to-cv-export .joy-panel:has([data-testid*="verification"]),
-.malt-to-cv-export .joy-panel:has(.verification),
-.malt-to-cv-export .joy-panel:has([class*="verification"]),
-
-/* "Ces profils correspondent aussi à votre recherche" */
-.malt-to-cv-export .joy-panel:has([data-testid*="similar"]),
-.malt-to-cv-export .joy-panel:has(.similar),
-.malt-to-cv-export .joy-panel:has([class*="similar"]),
-
 /* Boutons d'extension des sections (après avoir cliqué dessus) */
 .malt-to-cv-export section[data-testid*="profile-main-skill-set-section"] .profile-show-more-or-less, /* "Compétences" */
 .malt-to-cv-export section[data-testid*="profile-description"] .read-more__link,                      /* "Description" */

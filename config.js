@@ -13,6 +13,14 @@ window.SECTIONS_CONFIG = [
         defaultValue: false
       },
       {
+        key: 'hideAnswerRate',
+        type: 'hide',
+        title: 'Masquer le taux de réponse',
+        selector: 'ul.profile-indicators li.profile-indicators-item[data-testid*="answer-rate-indicator"]',
+        defaultValue: true,
+        hidden: true
+      },
+      {
         key: 'hideAvailability',
         type: 'hide',
         title: 'Masquer la disponibilité',
@@ -30,6 +38,14 @@ window.SECTIONS_CONFIG = [
         title: 'Masquer la localisation',
         selector: '.profile-wrapper__profile-sidemenu section:has(.profile__location-and-workplace-preferences__wrapper)',
         defaultValue: false
+      },
+      {
+        key: 'hideVerifications',
+        type: 'hide',
+        title: 'Masquer les vérifications',
+        selector: '.profile-wrapper__profile-sidemenu section:has(.checklist-verification-charter)',
+        defaultValue: true,
+        hidden: true
       },
       {
         key: 'hideInfluence',
@@ -51,6 +67,15 @@ window.SECTIONS_CONFIG = [
         title: 'Masquer les catégories',
         selector: '.profile-wrapper__profile-sidemenu section[data-testid="categories-section"]',
         defaultValue: false
+      },
+      
+      {
+        key: 'hideSimilarProfiles',
+        type: 'hide',
+        title: 'Masquer les profils similaires',
+        selector: '.profile-wrapper__profile-sidemenu section[data-testid="similar-profiles"]',
+        defaultValue: true,
+        hidden: true
       }
     ]
   },
