@@ -1,30 +1,37 @@
 // Gestion des options de personnalisation
-const options = { ...DEFAULT_OPTIONS };
+const options = { ...getDefaultOptions() };
 
 // Générer l'interface dynamiquement
 function generateInterface() {
-  // Générer les options de masquage
-  const hideOptionsContainer = document.getElementById('hideOptions');
-  OPTIONS_CONFIG.forEach(config => {
-    const checkboxItem = document.createElement('div');
-    checkboxItem.className = 'checkbox-item';
-    checkboxItem.innerHTML = `
-      <input type="checkbox" id="${config.key}">
-      <label for="${config.key}">${config.title}</label>
-    `;
-    hideOptionsContainer.appendChild(checkboxItem);
-  });
-
-  // Générer les options d'expansion
-  const expandOptionsContainer = document.getElementById('expandOptions');
-  EXPANSION_CONFIG.forEach(config => {
-    const checkboxItem = document.createElement('div');
-    checkboxItem.className = 'checkbox-item';
-    checkboxItem.innerHTML = `
-      <input type="checkbox" id="${config.key}">
-      <label for="${config.key}">${config.title}</label>
-    `;
-    expandOptionsContainer.appendChild(checkboxItem);
+  const optionsContainer = document.getElementById('optionsContainer');
+  
+  SECTIONS_CONFIG.forEach(section => {
+    // Créer une section
+    const sectionDiv = document.createElement('div');
+    sectionDiv.className = 'option-group';
+    
+    // Créer le titre de la section
+    const sectionTitle = document.createElement('label');
+    sectionTitle.textContent = section.title;
+    sectionDiv.appendChild(sectionTitle);
+    
+    // Créer le conteneur des checkboxes
+    const checkboxGroup = document.createElement('div');
+    checkboxGroup.className = 'checkbox-group';
+    
+    // Ajouter les options de la section
+    section.options.forEach(config => {
+      const checkboxItem = document.createElement('div');
+      checkboxItem.className = 'checkbox-item';
+      checkboxItem.innerHTML = `
+        <input type="checkbox" id="${config.key}">
+        <label for="${config.key}">${config.title}</label>
+      `;
+      checkboxGroup.appendChild(checkboxItem);
+    });
+    
+    sectionDiv.appendChild(checkboxGroup);
+    optionsContainer.appendChild(sectionDiv);
   });
 }
 
@@ -48,20 +55,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // Mettre à jour l'interface selon les options
 function updateUI() {
-  // Mettre à jour toutes les options de masquage
-  OPTIONS_CONFIG.forEach(config => {
-    const element = document.getElementById(config.key);
-    if (element) {
-      element.checked = options[config.key];
-    }
-  });
-
-  // Mettre à jour toutes les options d'expansion
-  EXPANSION_CONFIG.forEach(config => {
-    const element = document.getElementById(config.key);
-    if (element) {
-      element.checked = options[config.key];
-    }
+  // Mettre à jour toutes les options de toutes les sections
+  SECTIONS_CONFIG.forEach(section => {
+    section.options.forEach(config => {
+      const element = document.getElementById(config.key);
+      if (element) {
+        element.checked = options[config.key];
+      }
+    });
   });
   
   // Désactiver les options d'expansion si les sections sont masquées
@@ -75,50 +76,49 @@ async function saveOptions() {
 
 // Fonction pour mettre à jour les options d'expansion
 function updateExpandOptions() {
-  EXPANSION_CONFIG.forEach(config => {
-    const expandElement = document.getElementById(config.key);
-    const hideElement = document.getElementById(config.dependsOn);
-    
-    if (expandElement && hideElement) {
-      // Désactiver l'expansion si la section est masquée
-      if (options[config.dependsOn]) {
-        expandElement.disabled = true;
-        expandElement.checked = false;
-        options[config.key] = false;
-      } else {
-        expandElement.disabled = false;
+  SECTIONS_CONFIG.forEach(section => {
+    section.options.forEach(config => {
+      // Ne traiter que les options d'expansion qui ont une dépendance
+      if (config.type === 'expand' && config.dependsOn) {
+        const expandElement = document.getElementById(config.key);
+        const hideElement = document.getElementById(config.dependsOn);
+        
+        if (expandElement && hideElement) {
+          // Désactiver l'expansion si la section est masquée
+          if (options[config.dependsOn]) {
+            expandElement.disabled = true;
+            expandElement.checked = false;
+            options[config.key] = false;
+          } else {
+            expandElement.disabled = false;
+          }
+        }
       }
-    }
+    });
   });
 }
 
 // Fonction pour attacher les gestionnaires d'événements
 function attachEventListeners() {
-  // Gestionnaires pour les options de masquage
-  OPTIONS_CONFIG.forEach(config => {
-    const element = document.getElementById(config.key);
-    if (element) {
-      element.addEventListener('change', (e) => {
-        options[config.key] = e.target.checked;
-        updateExpandOptions();
-        saveOptions();
-        // Mettre à jour la surbrillance
-        updateHighlighting();
-      });
-    }
-  });
-
-  // Gestionnaires pour les options d'expansion
-  EXPANSION_CONFIG.forEach(config => {
-    const element = document.getElementById(config.key);
-    if (element) {
-      element.addEventListener('change', (e) => {
-        options[config.key] = e.target.checked;
-        saveOptions();
-        // Mettre à jour la surbrillance
-        updateHighlighting();
-      });
-    }
+  // Gestionnaires pour toutes les options de toutes les sections
+  SECTIONS_CONFIG.forEach(section => {
+    section.options.forEach(config => {
+      const element = document.getElementById(config.key);
+      if (element) {
+        element.addEventListener('change', (e) => {
+          options[config.key] = e.target.checked;
+          
+          // Mettre à jour les options d'expansion si c'est une option de masquage
+          if (config.type === 'hide') {
+            updateExpandOptions();
+          }
+          
+          saveOptions();
+          // Mettre à jour la surbrillance
+          updateHighlighting();
+        });
+      }
+    });
   });
 }
 

@@ -77,14 +77,19 @@ function expandSections(options) {
   });
   
   // Déployer conditionnellement selon les options
-  EXPANSION_CONFIG.forEach(config => {
-    const shouldExpand = options[config.key];
-    const isNotHidden = !config.dependsOn || !options[config.dependsOn];
-    
-    if (shouldExpand && isNotHidden) {
-      const buttons = document.querySelectorAll(config.selector);
-      buttons.forEach(button => button.click());
-    }
+  SECTIONS_CONFIG.forEach(section => {
+    section.options.forEach(config => {
+      // Ne traiter que les options d'expansion
+      if (config.type === 'expand') {
+        const shouldExpand = options[config.key];
+        const isNotHidden = !config.dependsOn || !options[config.dependsOn];
+        
+        if (shouldExpand && isNotHidden) {
+          const buttons = document.querySelectorAll(config.selector);
+          buttons.forEach(button => button.click());
+        }
+      }
+    });
   });
 }
 
@@ -92,13 +97,16 @@ function expandSections(options) {
 function applyHidingOptions(options) {
   console.log('🔧 Application des options de masquage:', options);
   
-  OPTIONS_CONFIG.forEach(config => {
-    if (options[config.key]) {
-      const elements = document.querySelectorAll(config.selector);
-      elements.forEach(el => {
-        el.style.display = 'none';
-      });
-    }
+  SECTIONS_CONFIG.forEach(section => {
+    section.options.forEach(config => {
+      // Ne traiter que les options de masquage
+      if (config.type === 'hide' && options[config.key]) {
+        const elements = document.querySelectorAll(config.selector);
+        elements.forEach(el => {
+          el.style.display = 'none';
+        });
+      }
+    });
   });
 }
 
@@ -148,10 +156,15 @@ function cleanup() {
 function restoreHiddenElements() {
   console.log('🔄 Restauration des éléments masqués');
   
-  OPTIONS_CONFIG.forEach(config => {
-    const elements = document.querySelectorAll(config.selector);
-    elements.forEach(el => {
-      el.style.display = '';
+  SECTIONS_CONFIG.forEach(section => {
+    section.options.forEach(config => {
+      // Ne traiter que les options de masquage
+      if (config.type === 'hide') {
+        const elements = document.querySelectorAll(config.selector);
+        elements.forEach(el => {
+          el.style.display = '';
+        });
+      }
     });
   });
 }
@@ -186,17 +199,20 @@ function updateHighlightingOnPage(options) {
   removeHighlightingFromPage();
   
   // Appliquer la surbrillance rouge pour les options cochées (masquage)
-  OPTIONS_CONFIG.forEach(config => {
-    if (options[config.key]) {
-      try {
-        const elements = document.querySelectorAll(config.selector);
-        elements.forEach(el => {
-          el.classList.add('highlight-to-hide');
-        });
-      } catch (error) {
-        // Erreur silencieuse
+  SECTIONS_CONFIG.forEach(section => {
+    section.options.forEach(config => {
+      // Ne traiter que les options de masquage
+      if (config.type === 'hide' && options[config.key]) {
+        try {
+          const elements = document.querySelectorAll(config.selector);
+          elements.forEach(el => {
+            el.classList.add('highlight-to-hide');
+          });
+        } catch (error) {
+          // Erreur silencieuse
+        }
       }
-    }
+    });
   });
   
   // Appliquer la surbrillance verte pour les sections qui seront étendues
@@ -218,19 +234,24 @@ function highlightExpandableSections(options) {
   });
   
   // Surligner conditionnellement selon les options d'expansion
-  EXPANSION_CONFIG.forEach(config => {
-    const shouldExpand = options[config.key];
-    const isNotHidden = !config.dependsOn || !options[config.dependsOn];
-    
-    if (shouldExpand && isNotHidden) {
-      try {
-        const elements = document.querySelectorAll(config.selector);
-        elements.forEach(el => {
-          el.classList.add('highlight-to-expand');
-        });
-      } catch (error) {
-        // Erreur silencieuse
+  SECTIONS_CONFIG.forEach(section => {
+    section.options.forEach(config => {
+      // Ne traiter que les options d'expansion
+      if (config.type === 'expand') {
+        const shouldExpand = options[config.key];
+        const isNotHidden = !config.dependsOn || !options[config.dependsOn];
+        
+        if (shouldExpand && isNotHidden) {
+          try {
+            const elements = document.querySelectorAll(config.selector);
+            elements.forEach(el => {
+              el.classList.add('highlight-to-expand');
+            });
+          } catch (error) {
+            // Erreur silencieuse
+          }
+        }
       }
-    }
+    });
   });
 }

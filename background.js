@@ -21,6 +21,6 @@ chrome.runtime.onInstalled.addListener((details) => {
   
   // Initialiser les options par défaut
   chrome.storage.local.set({
-    maltToCvOptions: window.DEFAULT_OPTIONS
+    maltToCvOptions: window.getDefaultOptions()
   });
 });
