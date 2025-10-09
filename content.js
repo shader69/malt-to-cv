@@ -48,6 +48,9 @@ async function generatePDF(options) {
     // Appliquer les options de masquage
     applyHidingOptions(options);
     
+    // Masquer tous les conteneurs d'expansion
+    hideExpansionContainers();
+    
     // Appliquer le style CV
     applyCVStyle();
     
@@ -79,8 +82,13 @@ function expandSections(options) {
         const isNotHidden = !config.dependsOn || !options[config.dependsOn];
         
         if (shouldExpand && isNotHidden) {
-          const buttons = document.querySelectorAll(config.selector);
-          buttons.forEach(button => button.click());
+          const containers = document.querySelectorAll(config.selector);
+          containers.forEach(container => {
+            const button = container.querySelector('button');
+            if (button) {
+              button.click();
+            }
+          });
         }
       }
     });
@@ -98,6 +106,21 @@ function applyHidingOptions(options) {
         const elements = document.querySelectorAll(config.selector);
         elements.forEach(el => {
           el.style.display = 'none';
+        });
+      }
+    });
+  });
+}
+
+// Fonction pour masquer tous les conteneurs d'expansion
+function hideExpansionContainers() {
+  SECTIONS_CONFIG.forEach(section => {
+    section.options.forEach(config => {
+      // Ne traiter que les options d'expansion
+      if (config.type === 'expand') {
+        const containers = document.querySelectorAll(config.selector);
+        containers.forEach(container => {
+          container.style.display = 'none';
         });
       }
     });
@@ -152,13 +175,10 @@ function restoreHiddenElements() {
   
   SECTIONS_CONFIG.forEach(section => {
     section.options.forEach(config => {
-      // Ne traiter que les options de masquage
-      if (config.type === 'hide') {
-        const elements = document.querySelectorAll(config.selector);
-        elements.forEach(el => {
-          el.style.display = '';
-        });
-      }
+      const elements = document.querySelectorAll(config.selector);
+      elements.forEach(el => {
+        el.style.display = '';
+      });
     });
   });
 }
@@ -225,9 +245,9 @@ function highlightExpandableSections(options) {
         
         if (shouldExpand && isNotHidden) {
           try {
-            const elements = document.querySelectorAll(config.selector);
-            elements.forEach(el => {
-              el.classList.add('highlight-to-expand');
+            const containers = document.querySelectorAll(config.selector);
+            containers.forEach(container => {
+              container.classList.add('highlight-to-expand');
             });
           } catch (error) {
             // Erreur silencieuse

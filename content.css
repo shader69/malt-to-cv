@@ -76,14 +76,6 @@ Masquer TOUJOURS certaines sections
 /* Header avec encart bleu qui bug */
 .malt-to-cv-export .profile-wrapper__profile .profile-wrapper__profile-breadcrumb.freelancer .shapes.freelancer,
 
-/* Boutons d'extension des sections (après avoir cliqué dessus) */
-.malt-to-cv-export section[data-testid*="profile-main-skill-set-section"] .profile-show-more-or-less, /* "Compétences" */
-.malt-to-cv-export section[data-testid*="profile-description"] .read-more__link,                      /* "Description" */
-.malt-to-cv-export section[data-testid*="profile-experience-section"] .profile-show-more-or-less,     /* "Expériences" */
-.malt-to-cv-export section#appraisalSection .read-more__link,                                         /* "Avis Malt" */
-.malt-to-cv-export section[data-testid*="recommendation-sections"] .profile-show-more-or-less,        /* "Recommandations externes" */
-.malt-to-cv-export section .read-more__link:has(#education-section),                                  /* "Formations" */
-
 /* Boutons cta */
 .malt-to-cv-export [class*="cta"],
 

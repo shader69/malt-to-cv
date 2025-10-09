@@ -82,30 +82,30 @@ window.SECTIONS_CONFIG = [
   {
     title: "Corps principal",
     options: [
-      {
-        key: 'expandDescription',
-        type: 'expand',
-        title: 'Étendre la description',
-        selector: 'section[data-testid*="profile-description"] .read-more__link button',
-        defaultValue: true,
-        hidden: true
-      },
-      {
-        key: 'expandExperiences',
-        type: 'expand',
-        title: 'Étendre les expériences',
-        selector: 'section[data-testid*="profile-experience-section"] .profile-show-more-or-less button',
-        defaultValue: true,
-        hidden: true
-      },
-      {
-        key: 'expandFormations',
-        type: 'expand',
-        title: 'Étendre les formations',
-        selector: 'section .read-more__link:has(#education-section) button',
-        defaultValue: true,
-        hidden: true
-      }
+       {
+         key: 'expandDescription',
+         type: 'expand',
+         title: 'Étendre la description',
+         selector: 'section[data-testid*="profile-description"] .read-more__link',
+         defaultValue: true,
+         hidden: true
+       },
+       {
+         key: 'expandExperiences',
+         type: 'expand',
+         title: 'Étendre les expériences',
+         selector: 'section[data-testid*="profile-experience-section"] .profile-show-more-or-less',
+         defaultValue: true,
+         hidden: true
+       },
+       {
+         key: 'expandFormations',
+         type: 'expand',
+         title: 'Étendre les formations',
+         selector: 'section .read-more__link:has(#education-section)',
+         defaultValue: true,
+         hidden: true
+       }
     ]
   },
   {
@@ -122,7 +122,7 @@ window.SECTIONS_CONFIG = [
         key: 'expandOtherSkills',
         type: 'expand',
         title: 'Étendre les compétences',
-        selector: 'section[data-testid*="profile-main-skill-set-section"] .profile-show-more-or-less button',
+        selector: 'section[data-testid*="profile-main-skill-set-section"] .profile-show-more-or-less',
         dependsOn: 'hideOtherSkills',
         defaultValue: true
       }
@@ -142,7 +142,7 @@ window.SECTIONS_CONFIG = [
         key: 'expandMaltReviews',
         type: 'expand',
         title: 'Étendre les avis Malt',
-        selector: 'section#appraisalSection .read-more__link button',
+        selector: 'section#appraisalSection .read-more__link',
         dependsOn: 'hideMaltReviews',
         defaultValue: true
       },
@@ -157,7 +157,7 @@ window.SECTIONS_CONFIG = [
         key: 'expandRecommendations',
         type: 'expand',
         title: 'Étendre les recommandations externes',
-        selector: 'section[data-testid*="recommendation-sections"] .profile-show-more-or-less button',
+        selector: 'section[data-testid*="recommendation-sections"] .profile-show-more-or-less',
         dependsOn: 'hideRecommendations',
         defaultValue: true
       }
