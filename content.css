@@ -12,28 +12,31 @@ Style général pour l'export
   padding: 20px !important;
 }
 
-/* Réorganiser la mise en page du profil */
+/* Conteneur principal (sidebar + profil) */
 .malt-to-cv-export .profile-wrapper__content {
   flex-direction: column !important;
 }
+
+/* Sidebar */
 .malt-to-cv-export .profile-wrapper__side-menu {
   min-width: none !important;
   max-width: none !important;
 }
+
+/* Sidebar > sections */
 .malt-to-cv-export .profile-wrapper__profile-sidemenu {
   display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  justify-content: space-between !important;
+  gap: calc(4px * 8) !important;
 }
 .malt-to-cv-export .profile-wrapper__profile-sidemenu section {
-  margin: calc(4px * 8);
-}
-.malt-to-cv-export .profile-wrapper__profile-sidemenu section:first-child {
-  margin-left: 0 !important;
-}
-.malt-to-cv-export .profile-wrapper__profile-sidemenu section:last-child {
-  margin-right: 0 !important;
+  flex: 0 1 auto !important;
+  width: auto !important;
 }
 
-.malt-to-cv-export h1, 
+/* .malt-to-cv-export h1, 
 .malt-to-cv-export h2, 
 .malt-to-cv-export h3 {
   color: #2c3e50 !important;
@@ -54,7 +57,7 @@ Style général pour l'export
   color: #34495e !important;
   border-bottom: 1px solid #bdc3c7 !important;
   padding-bottom: 5px !important;
-}
+} */
 
 /* Optimiser pour l'impression */
 @media print {
@@ -80,8 +83,16 @@ Masquer TOUJOURS certaines sections
 .malt-to-cv-export [class*="cta"],
 
 /* Navbar */
-.malt-to-cv-export #navbar-app {
+.malt-to-cv-export #navbar-app,
+
+/* Sidebar > sections > margin-bottom*/
+.malt-to-cv-export .profile-wrapper__side-menu section .left-side-component__actions {
   display: none !important;
+}
+
+/* Sidebar > sections > padding-bottom*/
+.malt-to-cv-export .profile-wrapper__side-menu section .left-side-component__content {
+  padding-bottom: 0 !important;
 }
 
 /*********************************************
