@@ -41,39 +41,57 @@ Transforme ton profil Malt en CV PDF personnalisé !
 
 ### Architecture dynamique
 
-L'extension utilise un **système de configuration centralisé** basé sur des tableaux d'objets :
+L'extension utilise un **système de configuration centralisé** basé sur des sections thématiques :
 
 #### **`config.js` - Configuration centralisée**
 ```javascript
-// Options de masquage
-window.OPTIONS_CONFIG = [
+// Configuration organisée par sections
+window.SECTIONS_CONFIG = [
   {
-    key: 'hideTJM',
-    title: 'Masquer le TJM',
-    selector: 'ul.profile-indicators li.profile-indicators-item:has([data-testid*="profile-price"])',
-    defaultValue: false
+    title: "📋 En tête de page",
+    options: [
+      {
+        key: 'hideTJM',
+        type: 'hide',
+        title: 'Masquer le TJM',
+        selector: 'ul.profile-indicators li.profile-indicators-item:has([data-testid*="profile-price"])',
+        defaultValue: false
+      },
+      // ... autres options
+    ]
   },
-  // ... autres options
-];
-
-// Options d'expansion
-window.EXPANSION_CONFIG = [
   {
-    key: 'expandOtherSkills',
-    title: 'Étendre les compétences',
-    selector: 'section[data-testid*="profile-main-skill-set-section"] .profile-show-more-or-less button',
-    dependsOn: 'hideOtherSkills',
-    defaultValue: true
+    title: "🎯 Compétences",
+    options: [
+      {
+        key: 'hideOtherSkills',
+        type: 'hide',
+        title: 'Masquer les autres compétences',
+        selector: '[data-testid="profile-main-skill-set"]',
+        defaultValue: false
+      },
+      {
+        key: 'expandOtherSkills',
+        type: 'expand',
+        title: 'Étendre les compétences',
+        selector: 'section[data-testid*="profile-main-skill-set-section"] .profile-show-more-or-less',
+        dependsOn: 'hideOtherSkills',
+        defaultValue: true
+      }
+    ]
   },
-  // ... autres options
+  // ... autres sections
 ];
 ```
 
 ### Fonctionnalités
 
+- ✅ **Interface par sections** : Options organisées en sections thématiques
 - ✅ **Interface dynamique** : Générée automatiquement depuis `config.js`
 - ✅ **Options centralisées** : Un seul endroit pour tout modifier
+- ✅ **Options masquables** : Paramètre `hidden` pour les options automatiques
 - ✅ **Dépendances automatiques** : Les options d'expansion se grisent si la section est masquée
+- ✅ **Masquage automatique** : Les conteneurs d'expansion sont masqués lors de la génération PDF
 - ✅ **Détection automatique** des profils Malt
 - ✅ **Génération PDF** avec l'API d'impression Chrome
 - ✅ **Sauvegarde des préférences** avec Chrome Storage API
@@ -91,39 +109,55 @@ window.EXPANSION_CONFIG = [
 
 ### Ajouter une nouvelle option
 
-**1. Ajouter dans `config.js` :**
+**1. Choisir ou créer une section dans `config.js` :**
 ```javascript
-// Dans OPTIONS_CONFIG
 {
-  key: 'hideNewOption',
-  title: 'Masquer nouvelle option',
-  selector: 'nouveau-selector-css',
-  defaultValue: false  // Valeur par défaut
-}
-
-// Dans EXPANSION_CONFIG (si applicable)
-{
-  key: 'expandNewOption',
-  title: 'Étendre nouvelle option',
-  selector: 'nouveau-selector-button',
-  dependsOn: 'hideNewOption',
-  defaultValue: true  // Valeur par défaut
+  title: "🎯 Ma nouvelle section",
+  options: [
+    // Option de masquage
+    {
+      key: 'hideNewElement',
+      type: 'hide',
+      title: 'Masquer nouvel élément',
+      selector: '.mon-selector-css',
+      defaultValue: false
+    },
+    // Option d'expansion (si applicable)
+    {
+      key: 'expandNewElement',
+      type: 'expand',
+      title: 'Étendre nouvel élément',
+      selector: '.mon-conteneur-bouton',  // Pointer vers le conteneur, pas le bouton
+      dependsOn: 'hideNewElement',  // Optionnel : dépendance
+      defaultValue: true
+    },
+    // Option cachée (non visible dans le popup)
+    {
+      key: 'autoHideElement',
+      type: 'hide',
+      title: 'Masquer automatiquement',
+      selector: '.element-a-masquer',
+      defaultValue: true,
+      hidden: true  // Ne s'affiche pas dans le popup
+    }
+  ]
 }
 ```
 
 **2. C'est tout !** 🎉
-- ✅ L'interface se génère automatiquement
+- ✅ L'interface se génère automatiquement par section
 - ✅ Les gestionnaires d'événements s'attachent automatiquement
 - ✅ Les dépendances sont gérées automatiquement
 - ✅ Les options par défaut sont mises à jour automatiquement
+- ✅ Les sections vides (toutes les options `hidden`) ne s'affichent pas
 
 ### Avantages de l'architecture
 
-- **DRY (Don't Repeat Yourself)** : Plus de code dupliqué
-- **Évolutif** : Ajouter des options en 2 lignes
-- **Maintenable** : Un seul endroit pour tout modifier
-- **Cohérent** : Toutes les options suivent le même pattern
-- **Logs automatiques** : Suivi des actions en temps réel
+- **Unique source de vérité** : `SECTIONS_CONFIG` contrôle tout (UI, logique, masquage)
+- **Organisation par sections** : Options regroupées par thème dans le popup
+- **Évolutif** : Ajouter des options en quelques lignes
+- **Flexible** : Options masquables avec le paramètre `hidden`
+- **Automatique** : Masquage des conteneurs d'expansion géré par la config
 
 ## 🐛 Dépannage
 
@@ -138,5 +172,3 @@ window.EXPANSION_CONFIG = [
 - L'extension fonctionne uniquement sur les profils Malt
 - Les options sont sauvegardées localement
 - Le PDF est généré côté client (pas d'envoi de données)
-- **Architecture évolutive** : Facile d'ajouter de nouvelles fonctionnalités
-- **Configuration centralisée** : Tout se gère depuis `config.js`
