@@ -78,7 +78,7 @@ window.SECTIONS_CONFIG = [
     ]
   },
   {
-    title: "Expériences & formations",
+    title: "💼 Expériences & formations",
     options: [
        {
          key: 'expandExperiences',
@@ -154,7 +154,7 @@ window.SECTIONS_CONFIG = [
     ]
   },
   {
-    title: "Divers",
+    title: "🧩 Divers",
     options: [
       {
         key: 'hideNavigation',

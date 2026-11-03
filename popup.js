@@ -1,6 +1,14 @@
 // Gestion des options de personnalisation
 const options = { ...getDefaultOptions() };
 
+// État de l'interface (groupes repliés), sauvegardé à part des options envoyées à la page
+const UI_STATE_KEY = 'maltToCvUiState';
+let uiStateReady = false;
+
+// Sécurité : si la page ne répond jamais, ne pas laisser le bouton bloqué
+const GENERATION_TIMEOUT_MS = 60000;
+let generationTimeout = null;
+
 // Générer l'interface dynamiquement
 function generateInterface() {
   const optionsContainer = document.getElementById('optionsContainer');
@@ -14,13 +22,21 @@ function generateInterface() {
       return;
     }
     
-    // Créer une section
-    const sectionDiv = document.createElement('div');
+    // Créer une section repliable (ouverte par défaut)
+    const sectionDiv = document.createElement('details');
     sectionDiv.className = 'option-group';
+    sectionDiv.dataset.title = section.title;
+    sectionDiv.open = true;
+    sectionDiv.addEventListener('toggle', saveUiState);
     
-    // Créer le titre de la section
-    const sectionTitle = document.createElement('label');
-    sectionTitle.textContent = section.title;
+    // Créer le titre de la section, avec un compteur visible quand elle est repliée
+    const sectionTitle = document.createElement('summary');
+    const titleText = document.createElement('span');
+    titleText.className = 'group-title';
+    titleText.textContent = section.title;
+    const countText = document.createElement('span');
+    countText.className = 'group-count';
+    sectionTitle.append(titleText, countText);
     sectionDiv.appendChild(sectionTitle);
     
     // Créer le conteneur des checkboxes
@@ -30,7 +46,7 @@ function generateInterface() {
     // Ajouter les options visibles de la section
     visibleOptions.forEach(config => {
       const checkboxItem = document.createElement('div');
-      checkboxItem.className = 'checkbox-item';
+      checkboxItem.className = `checkbox-item checkbox-item--${config.type}`;
       checkboxItem.innerHTML = `
         <input type="checkbox" id="${config.key}">
         <label for="${config.key}">${config.title}</label>
@@ -41,6 +57,61 @@ function generateInterface() {
     sectionDiv.appendChild(checkboxGroup);
     optionsContainer.appendChild(sectionDiv);
   });
+}
+
+// Compteur "2 masqués · 1 déplié" affiché dans le titre des groupes repliés
+function updateGroupCounts() {
+  SECTIONS_CONFIG.forEach(section => {
+    const group = Array.from(document.querySelectorAll('.option-group[data-title]'))
+      .find(el => el.dataset.title === section.title);
+    if (!group) {
+      return;
+    }
+
+    const visibleOptions = section.options.filter(opt => !opt.hidden);
+    const hiddenCount = visibleOptions.filter(opt => opt.type === 'hide' && options[opt.key]).length;
+    const expandedCount = visibleOptions.filter(opt => opt.type === 'expand' && options[opt.key]).length;
+
+    const parts = [];
+    if (hiddenCount > 0) {
+      parts.push(`${hiddenCount} masqué${hiddenCount > 1 ? 's' : ''}`);
+    }
+    if (expandedCount > 0) {
+      parts.push(`${expandedCount} déplié${expandedCount > 1 ? 's' : ''}`);
+    }
+    group.querySelector('.group-count').textContent = parts.join(' · ');
+  });
+}
+
+// Sauvegarde / restauration des groupes repliés
+async function saveUiState() {
+  if (!uiStateReady) {
+    return;
+  }
+  const collapsedGroups = Array.from(document.querySelectorAll('.option-group[data-title]'))
+    .filter(el => !el.open)
+    .map(el => el.dataset.title);
+  await chrome.storage.local.set({ [UI_STATE_KEY]: { collapsedGroups } });
+}
+
+async function restoreUiState() {
+  const saved = await chrome.storage.local.get(UI_STATE_KEY);
+  const collapsedGroups = (saved[UI_STATE_KEY] && saved[UI_STATE_KEY].collapsedGroups) || [];
+
+  document.querySelectorAll('.option-group[data-title]').forEach(el => {
+    el.open = !collapsedGroups.includes(el.dataset.title);
+  });
+
+  // Les événements "toggle" déclenchés par la restauration sont asynchrones : on les laisse passer
+  setTimeout(() => { uiStateReady = true; }, 0);
+}
+
+// Remettre toutes les options à leur valeur par défaut
+function resetOptions() {
+  Object.assign(options, getDefaultOptions());
+  updateUI();
+  saveOptions();
+  updateHighlighting();
 }
 
 // Charger les options sauvegardées
@@ -95,6 +166,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateUI();
   }
   
+  updateGroupCounts();
+  await restoreUiState();
+  
+  // Pied de page : version et réinitialisation
+  document.getElementById('appVersion').textContent = `v${chrome.runtime.getManifest().version}`;
+  document.getElementById('resetBtn').addEventListener('click', resetOptions);
+  document.getElementById('footer').hidden = false;
+  
   // Appliquer la surbrillance dès l'ouverture
   updateHighlighting();
 });
@@ -113,6 +192,8 @@ function updateUI() {
   
   // Désactiver les options d'expansion si les sections sont masquées
   updateExpandOptions();
+  
+  updateGroupCounts();
 }
 
 // Sauvegarder les options
@@ -160,6 +241,7 @@ function attachEventListeners() {
           }
           
           saveOptions();
+          updateGroupCounts();
           // Mettre à jour la surbrillance
           updateHighlighting();
         });
@@ -253,49 +335,59 @@ async function ensureContentScriptLoaded(tabId) {
   }
 }
 
+// Bouton "Générer" : reste en état "Génération..." jusqu'à la réponse de la page
+// (pdfGenerated / pdfError), et non juste le temps d'envoyer le message
+function setGenerating(isGenerating) {
+  const generateBtn = document.getElementById('generateBtn');
+  generateBtn.disabled = isGenerating;
+  generateBtn.textContent = isGenerating ? '⏳ Génération...' : '📄 Générer le CV PDF';
+
+  clearTimeout(generationTimeout);
+  if (isGenerating) {
+    generationTimeout = setTimeout(() => {
+      setGenerating(false);
+      showStatus('❌ La génération prend trop de temps, réessaie', 'error');
+    }, GENERATION_TIMEOUT_MS);
+  }
+}
+
 // Fonction pour générer le PDF
 document.getElementById('generateBtn').addEventListener('click', async () => {
-  const generateBtn = document.getElementById('generateBtn');
-  const originalText = generateBtn.textContent;
-  
   try {
-    // Désactiver le bouton
-    generateBtn.disabled = true;
-    generateBtn.textContent = '⏳ Génération...';
-    
+    setGenerating(true);
+    showStatus('Préparation de la page, la fenêtre d\'impression va s\'ouvrir…', 'info');
+
     // Récupérer l'onglet actif
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    
+
     // S'assurer que le content script est chargé
     const isLoaded = await ensureContentScriptLoaded(tab.id);
     if (!isLoaded) {
       showStatus('❌ Impossible de charger le script sur cette page', 'error');
+      setGenerating(false);
       return;
     }
-    
+
     // Envoyer les options au content script
     await chrome.tabs.sendMessage(tab.id, {
       action: 'generatePDF',
       options: options
     });
-    
-    showStatus('✅ CV généré avec succès !', 'success');
-    
+
   } catch (error) {
     console.error('Erreur lors de la génération:', error);
     showStatus('❌ Erreur lors de la génération du PDF', 'error');
-  } finally {
-    // Réactiver le bouton
-    generateBtn.disabled = false;
-    generateBtn.textContent = originalText;
+    setGenerating(false);
   }
 });
 
 // Écouter les messages du content script
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'pdfGenerated') {
+    setGenerating(false);
     showStatus('✅ CV PDF téléchargé !', 'success');
   } else if (message.action === 'pdfError') {
+    setGenerating(false);
     showStatus('❌ Erreur lors de la génération du PDF', 'error');
   }
 });

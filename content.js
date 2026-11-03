@@ -163,8 +163,9 @@ async function loadLazyImages() {
 const DYNAMIC_STYLE_ID = 'malt-to-cv-dynamic-style';
 const dynamicState = { highlightOptions: null, exportOptions: null };
 
-const HIGHLIGHT_HIDE_CSS = 'background-color: rgba(255, 99, 99, 0.2) !important; border: 2px solid rgba(255, 99, 99, 0.6) !important; border-radius: 4px !important; box-shadow: 0 0 10px rgba(255, 99, 99, 0.3) !important;';
-const HIGHLIGHT_EXPAND_CSS = 'background-color: rgba(99, 255, 99, 0.2) !important; border: 2px solid rgba(99, 255, 99, 0.6) !important; border-radius: 4px !important; box-shadow: 0 0 10px rgba(99, 255, 99, 0.3) !important;';
+// Rouge / vert du design system de Malt, comme les cases à cocher du popup
+const HIGHLIGHT_HIDE_CSS = 'background-color: rgba(224, 45, 45, 0.15) !important; border: 2px solid rgba(224, 45, 45, 0.6) !important; border-radius: 4px !important; box-shadow: 0 0 10px rgba(224, 45, 45, 0.3) !important;';
+const HIGHLIGHT_EXPAND_CSS = 'background-color: rgba(129, 185, 40, 0.15) !important; border: 2px solid rgba(129, 185, 40, 0.6) !important; border-radius: 4px !important; box-shadow: 0 0 10px rgba(129, 185, 40, 0.3) !important;';
 
 function renderDynamicStyle() {
   let styleEl = document.getElementById(DYNAMIC_STYLE_ID);

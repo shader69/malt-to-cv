@@ -3,13 +3,44 @@
 <head>
   <meta charset="utf-8">
   <style>
+    /* Couleurs du design system de Malt (variables --joy-color-* du site) */
+    :root {
+      --bg: #ffffff;
+      --text: #333330;
+      --muted: #737370;
+      --card-bg: #f7f7f5;
+      --accent: #035266;
+      --accent-hover: #014554;
+      --cta: #fc5757;
+      --cta-hover: #d4524f;
+      --disabled: #b7b6b2;
+      --border: #e0ded9;
+      --hide: #e02d2d;
+      --expand: #81b928;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #181818;
+        --text: #f7f7f5;
+        --muted: #b7b6b2;
+        --card-bg: #333330;
+        --accent: #00aac1;
+        --accent-hover: #00c0db;
+        --disabled: #4b4b4b;
+        --border: #4b4b4b;
+      }
+    }
+    
     body {
-      width: 350px;
+      width: 320px;
       padding: 20px;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       margin: 0;
-      max-height: 600px;
+      /* max-height: 600px; */
       overflow-y: auto;
+      background: var(--bg);
+      color: var(--text);
     }
     
     .header {
@@ -19,7 +50,7 @@
     
     .header h1 {
       margin: 0;
-      color: #2c3e50;
+      color: var(--text);
       font-size: 18px;
     }
     
@@ -28,19 +59,88 @@
     }
     
     .option-group {
-      margin-bottom: 20px;
-      padding: 15px;
-      background: #f8f9fa;
-      border-radius: 8px;
-      border-left: 3px solid #667eea;
+      margin-bottom: 12px;
+      padding: 12px 14px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
     }
     
-    .option-group label {
-      display: block;
-      margin-bottom: 10px;
+    .option-group summary {
+      display: flex;
+      align-items: center;
+      gap: 8px;
       font-weight: 600;
-      color: #2c3e50;
+      color: var(--text);
       font-size: 14px;
+      cursor: pointer;
+      list-style: none;
+    }
+    
+    .option-group summary::-webkit-details-marker {
+      display: none;
+    }
+    
+    .group-title {
+      flex: 1;
+    }
+    
+    /* Résumé des options actives, visible seulement quand le groupe est replié */
+    .group-count {
+      font-size: 12px;
+      font-weight: normal;
+      color: var(--muted);
+    }
+    
+    .option-group[open] .group-count {
+      display: none;
+    }
+    
+    /* Pied de page */
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 16px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    
+    .footer[hidden] {
+      display: none;
+    }
+    
+    .reset-btn {
+      padding: 0;
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 12px;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    
+    .reset-btn:hover {
+      color: var(--text);
+    }
+    
+    /* Chevron qui pivote à l'ouverture */
+    .option-group summary::after {
+      content: '';
+      width: 7px;
+      height: 7px;
+      border-right: 2px solid var(--muted);
+      border-bottom: 2px solid var(--muted);
+      transform: rotate(45deg);
+      transition: transform 0.2s;
+    }
+    
+    .option-group[open] summary::after {
+      transform: rotate(-135deg);
+    }
+    
+    .option-group[open] summary {
+      margin-bottom: 12px;
     }
     
     .checkbox-group {
@@ -55,36 +155,83 @@
       gap: 8px;
     }
     
+    /* Rouge = l'élément sera masqué, vert = il sera déplié (mêmes couleurs que la surbrillance sur la page) */
+    .checkbox-item--hide {
+      --box-color: var(--hide);
+    }
+    
+    .checkbox-item--expand {
+      --box-color: var(--expand);
+    }
+    
     .checkbox-item input[type="checkbox"] {
+      appearance: none;
+      -webkit-appearance: none;
+      flex: none;
+      display: grid;
+      place-content: center;
+      width: 18px;
+      height: 18px;
       margin: 0;
+      border: 2px solid var(--box-color);
+      border-radius: 5px;
+      background: transparent;
+      cursor: pointer;
+    }
+    
+    .checkbox-item input[type="checkbox"]:checked {
+      background: var(--box-color);
+    }
+    
+    .checkbox-item input[type="checkbox"]:checked::after {
+      content: '';
+      width: 9px;
+      height: 5px;
+      border-left: 2px solid #fff;
+      border-bottom: 2px solid #fff;
+      transform: translateY(-1px) rotate(-45deg);
     }
     
     .checkbox-item label {
       margin: 0;
       font-weight: normal;
       font-size: 14px;
+      line-height: 1.3;
+      color: var(--text);
       cursor: pointer;
     }
     
+    /* Option dépendante d'une section masquée */
+    .checkbox-item input:disabled,
+    .checkbox-item input:disabled + label {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
     .generate-btn {
+      /* Toujours visible en bas du popup, même quand la liste d'options est longue */
+      position: sticky;
+      bottom: 12px;
       width: 100%;
       padding: 12px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: var(--cta);
       color: white;
       border: none;
       border-radius: 8px;
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
       transition: transform 0.2s;
     }
     
     .generate-btn:hover {
+      background: var(--cta-hover);
       transform: translateY(-2px);
     }
     
     .generate-btn:disabled {
-      background: #bdc3c7;
+      background: var(--disabled);
       cursor: not-allowed;
       transform: none;
     }
@@ -119,7 +266,7 @@
     .action-btn {
       width: 100%;
       padding: 12px;
-      background: #667eea;
+      background: var(--accent);
       color: white;
       border: none;
       border-radius: 8px;
@@ -131,13 +278,23 @@
     }
     
     .action-btn:hover {
-      background: #5568d3;
+      background: var(--accent-hover);
+    }
+    
+    /* Navigation au clavier */
+    .generate-btn:focus-visible,
+    .reset-btn:focus-visible,
+    .action-btn:focus-visible,
+    .option-group summary:focus-visible,
+    .checkbox-item input:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
     }
   </style>
 </head>
 <body>
   <div class="header">
-    <h1>🎯 Malt to CV</h1>
+    <h1>Malt to CV</h1>
   </div>
   
   <div id="optionsContainer" class="options">
@@ -151,6 +308,11 @@
   <div id="status" class="status"></div>
   
   <div id="actionBtnContainer"></div>
+  
+  <div id="footer" class="footer" hidden>
+    <button id="resetBtn" class="reset-btn" type="button">Réinitialiser les options</button>
+    <span id="appVersion"></span>
+  </div>
   
   <script src="config.js"></script>
   <script src="popup.js"></script>
