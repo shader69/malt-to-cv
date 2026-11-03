@@ -10,10 +10,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     generatePDF(message.options);
   }
   
-  if (message.action === 'highlightElements') {
-    highlightElementsOnPage(message.selector);
-  }
-  
   if (message.action === 'removeHighlighting') {
     removeHighlightingFromPage();
   }
@@ -43,13 +39,13 @@ async function generatePDF(options) {
     }
     
     // Déployer les sections selon les options
-    expandSections(options);
-    
+    await expandSections(options);
+
+    // Charger les images lazy (ex: logo Github de l'influence, tout en bas de la page)
+    await loadLazyImages();
+
     // Appliquer les options de masquage
     applyHidingOptions(options);
-    
-    // Masquer tous les conteneurs d'expansion
-    hideExpansionContainers();
     
     // Appliquer le style CV
     applyCVStyle();
@@ -70,67 +66,136 @@ async function generatePDF(options) {
 }
 
 // Fonction générique pour déployer les sections selon les options
-function expandSections(options) {
+// Se fait en plusieurs passes : déployer une liste ("Afficher les 6 expériences")
+// fait apparaître de nouveaux éléments, qui ont chacun leur propre bouton
+// "Voir plus" à cliquer à la passe suivante.
+async function expandSections(options) {
   console.log('📖 Déploiement des sections selon les options:', options);
   
-  // Déployer toutes les sections d'expansion selon les options
+  const MAX_PASSES = 5;
+  const PASS_DELAY_MS = 400;
+  // Boutons déjà cliqués : après un clic, "Voir plus" devient "Voir moins"
+  // sur le même élément, il ne faut surtout pas le re-cliquer
+  const alreadyClicked = new WeakSet();
+  
+  for (let pass = 0; pass < MAX_PASSES; pass++) {
+    let clickCount = 0;
+    
+    // Déployer toutes les sections d'expansion selon les options
+    SECTIONS_CONFIG.forEach(section => {
+      section.options.forEach(config => {
+        // Ne traiter que les options d'expansion
+        if (config.type === 'expand') {
+          const shouldExpand = options[config.key];
+          const isNotHidden = !config.dependsOn || !options[config.dependsOn];
+          
+          if (shouldExpand && isNotHidden) {
+            const containers = document.querySelectorAll(config.selector);
+            containers.forEach(container => {
+              // Chercher un bouton ou un lien d'expansion
+              let button;
+              if (['a', 'button'].includes(container.tagName.toLowerCase())) {
+                button = container;
+              } else {
+                button = container.querySelector('a, button');
+              }
+              if (button && !alreadyClicked.has(button)) {
+                alreadyClicked.add(button);
+                button.click();
+                clickCount++;
+              }
+            });
+          }
+        }
+      });
+    });
+    
+    // Plus rien de nouveau à déployer
+    if (clickCount === 0) {
+      break;
+    }
+    
+    // Laisser le temps à la page d'afficher les nouveaux éléments
+    await new Promise(resolve => setTimeout(resolve, PASS_DELAY_MS));
+  }
+}
+
+// Les images en loading="lazy" ne se chargent que quand on scrolle jusqu'à elles :
+// celles du bas de page sont absentes du PDF si on n'a pas scrollé jusque-là
+async function loadLazyImages() {
+  const LOAD_TIMEOUT_MS = 3000;
+  const images = Array.from(document.querySelectorAll('img[loading="lazy"]'));
+
+  const loadings = images.map(img => {
+    img.loading = 'eager';
+    if (img.complete) {
+      return Promise.resolve();
+    }
+    return new Promise(resolve => {
+      img.addEventListener('load', resolve, { once: true });
+      img.addEventListener('error', resolve, { once: true });
+    });
+  });
+
+  await Promise.race([
+    Promise.all(loadings),
+    new Promise(resolve => setTimeout(resolve, LOAD_TIMEOUT_MS))
+  ]);
+}
+
+// Les règles sont injectées dans une feuille de style plutôt que posées en
+// style inline / classes : Malt utilise des règles !important et re-rend ses
+// composants (Vue) de façon asynchrone, ce qui écrasait les modifications
+// faites directement sur les éléments.
+const DYNAMIC_STYLE_ID = 'malt-to-cv-dynamic-style';
+const dynamicState = { highlightOptions: null, exportOptions: null };
+
+const HIGHLIGHT_HIDE_CSS = 'background-color: rgba(255, 99, 99, 0.2) !important; border: 2px solid rgba(255, 99, 99, 0.6) !important; border-radius: 4px !important; box-shadow: 0 0 10px rgba(255, 99, 99, 0.3) !important;';
+const HIGHLIGHT_EXPAND_CSS = 'background-color: rgba(99, 255, 99, 0.2) !important; border: 2px solid rgba(99, 255, 99, 0.6) !important; border-radius: 4px !important; box-shadow: 0 0 10px rgba(99, 255, 99, 0.3) !important;';
+
+function renderDynamicStyle() {
+  let styleEl = document.getElementById(DYNAMIC_STYLE_ID);
+  const rules = [];
+
+  const exportOptions = dynamicState.exportOptions;
+  const highlightOptions = dynamicState.highlightOptions;
+
   SECTIONS_CONFIG.forEach(section => {
     section.options.forEach(config => {
-      // Ne traiter que les options d'expansion
-      if (config.type === 'expand') {
-        const shouldExpand = options[config.key];
-        const isNotHidden = !config.dependsOn || !options[config.dependsOn];
-        
-        if (shouldExpand && isNotHidden) {
-          const containers = document.querySelectorAll(config.selector);
-          containers.forEach(container => {
-            // Chercher un bouton ou un lien d'expansion
-            let button;
-            if (['a', 'button'].includes(container.tagName.toLowerCase())) {
-              button = container;
-            } else {
-              button = container.querySelector('a, button');
-            }
-            if (button) {
-              button.click();
-            }
-          });
+      if (exportOptions) {
+        const hide = config.type === 'hide' && exportOptions[config.key];
+        // Les conteneurs d'expansion sont toujours masqués dans le PDF
+        if (hide || config.type === 'expand') {
+          rules.push(`html body.malt-to-cv-export :is(${config.selector}) { display: none !important; }`);
+        }
+      } else if (highlightOptions) {
+        const checked = highlightOptions[config.key];
+        if (config.type === 'hide' && checked) {
+          rules.push(`html body :is(${config.selector}) { ${HIGHLIGHT_HIDE_CSS} }`);
+        } else if (config.type === 'expand' && checked && (!config.dependsOn || !highlightOptions[config.dependsOn])) {
+          rules.push(`html body :is(${config.selector}) { ${HIGHLIGHT_EXPAND_CSS} }`);
         }
       }
     });
   });
+
+  if (!rules.length) {
+    if (styleEl) styleEl.remove();
+    return;
+  }
+  if (!styleEl) {
+    styleEl = document.createElement('style');
+    styleEl.id = DYNAMIC_STYLE_ID;
+    document.head.appendChild(styleEl);
+  }
+  styleEl.textContent = rules.join(' ');
 }
 
 // Fonction générique pour appliquer les options de masquage
 function applyHidingOptions(options) {
   console.log('🔧 Application des options de masquage:', options);
-  
-  SECTIONS_CONFIG.forEach(section => {
-    section.options.forEach(config => {
-      // Ne traiter que les options de masquage
-      if (config.type === 'hide' && options[config.key]) {
-        const elements = document.querySelectorAll(config.selector);
-        elements.forEach(el => {
-          el.style.display = 'none';
-        });
-      }
-    });
-  });
-}
-
-// Fonction pour masquer tous les conteneurs d'expansion
-function hideExpansionContainers() {
-  SECTIONS_CONFIG.forEach(section => {
-    section.options.forEach(config => {
-      // Ne traiter que les options d'expansion
-      if (config.type === 'expand') {
-        const containers = document.querySelectorAll(config.selector);
-        containers.forEach(container => {
-          container.style.display = 'none';
-        });
-      }
-    });
-  });
+  dynamicState.exportOptions = options;
+  renderDynamicStyle();
 }
 
 // Fonction pour appliquer le style CV
@@ -168,98 +233,21 @@ function cleanup() {
   // Retirer la classe d'export
   document.body.classList.remove('malt-to-cv-export');
   
-  // Restaurer tous les éléments masqués via les options
-  restoreHiddenElements();
-  
-  // Retirer toute la surbrillance
-  removeHighlightingFromPage();
-}
-
-// Fonction générique pour restaurer les éléments masqués
-function restoreHiddenElements() {
-  console.log('🔄 Restauration des éléments masqués');
-  
-  SECTIONS_CONFIG.forEach(section => {
-    section.options.forEach(config => {
-      const elements = document.querySelectorAll(config.selector);
-      elements.forEach(el => {
-        el.style.display = '';
-      });
-    });
-  });
-}
-
-// Fonction pour surligner les éléments sur la page
-function highlightElementsOnPage(selector) {
-  // Retirer d'abord toute surbrillance existante
-  removeHighlightingFromPage();
-  
-  try {
-    const elements = document.querySelectorAll(selector);
-    elements.forEach(el => {
-      el.classList.add('highlight-to-hide');
-    });
-  } catch (error) {
-    // Erreur silencieuse
-  }
+  // Retirer les règles de masquage et la surbrillance
+  dynamicState.exportOptions = null;
+  dynamicState.highlightOptions = null;
+  renderDynamicStyle();
 }
 
 // Fonction pour retirer la surbrillance de la page
 function removeHighlightingFromPage() {
-  const highlightedElements = document.querySelectorAll('.highlight-to-hide, .highlight-to-expand');
-  highlightedElements.forEach(el => {
-    el.classList.remove('highlight-to-hide');
-    el.classList.remove('highlight-to-expand');
-  });
+  dynamicState.highlightOptions = null;
+  renderDynamicStyle();
 }
 
 // Fonction pour mettre à jour la surbrillance selon les options
+// (rouge : masquage, vert : expansion)
 function updateHighlightingOnPage(options) {
-  // Retirer toute surbrillance existante
-  removeHighlightingFromPage();
-  
-  // Appliquer la surbrillance rouge pour les options cochées (masquage)
-  SECTIONS_CONFIG.forEach(section => {
-    section.options.forEach(config => {
-      // Ne traiter que les options de masquage
-      if (config.type === 'hide' && options[config.key]) {
-        try {
-          const elements = document.querySelectorAll(config.selector);
-          elements.forEach(el => {
-            el.classList.add('highlight-to-hide');
-          });
-        } catch (error) {
-          // Erreur silencieuse
-        }
-      }
-    });
-  });
-  
-  // Appliquer la surbrillance verte pour les sections qui seront étendues
-  highlightExpandableSections(options);
-}
-
-// Fonction pour surligner les sections qui vont être étendues
-function highlightExpandableSections(options) {
-  // Surligner toutes les sections d'expansion selon les options
-  SECTIONS_CONFIG.forEach(section => {
-    section.options.forEach(config => {
-      // Ne traiter que les options d'expansion
-      if (config.type === 'expand') {
-        const shouldExpand = options[config.key];
-        const isNotHidden = !config.dependsOn || !options[config.dependsOn];
-        
-        if (shouldExpand && isNotHidden) {
-          try {
-            const containers = document.querySelectorAll(config.selector);
-            containers.forEach(container => {
-              container.classList.add('highlight-to-expand');
-            });
-          } catch (error) {
-            // Erreur silencieuse
-          }
-        }
-      }
-    });
-  });
+  dynamicState.highlightOptions = options;
+  renderDynamicStyle();
 }

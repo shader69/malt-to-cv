@@ -236,8 +236,8 @@ async function ensureContentScriptLoaded(tabId) {
     // Si le content script n'est pas chargé, l'injecter
     try {
       await chrome.scripting.executeScript({
-        target: { tabId: tabId },
-        files: ['content.js']
+        target: { tabId },
+        files: ['config.js', 'content.js']
       });
       
       // Attendre un peu que le script se charge
