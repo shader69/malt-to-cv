@@ -84,7 +84,13 @@ function expandSections(options) {
         if (shouldExpand && isNotHidden) {
           const containers = document.querySelectorAll(config.selector);
           containers.forEach(container => {
-            const button = container.querySelector('button');
+            // Chercher un bouton ou un lien d'expansion
+            let button;
+            if (['a', 'button'].includes(container.tagName.toLowerCase())) {
+              button = container;
+            } else {
+              button = container.querySelector('a, button');
+            }
             if (button) {
               button.click();
             }

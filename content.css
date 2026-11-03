@@ -1,5 +1,3 @@
-
-
 /*********************************************
 Style général pour l'export 
 ************************************************/
@@ -10,30 +8,6 @@ Style général pour l'export
   color: #333 !important;
   background: white !important;
   padding: 20px !important;
-}
-
-/* Conteneur principal (sidebar + profil) */
-.malt-to-cv-export .profile-wrapper__content {
-  flex-direction: column !important;
-}
-
-/* Sidebar */
-.malt-to-cv-export .profile-wrapper__side-menu {
-  min-width: none !important;
-  max-width: none !important;
-}
-
-/* Sidebar > sections */
-.malt-to-cv-export .profile-wrapper__profile-sidemenu {
-  display: flex !important;
-  flex-direction: row !important;
-  flex-wrap: wrap !important;
-  justify-content: space-between !important;
-  gap: calc(4px * 8) !important;
-}
-.malt-to-cv-export .profile-wrapper__profile-sidemenu section {
-  flex: 0 1 auto !important;
-  width: auto !important;
 }
 
 /* .malt-to-cv-export h1, 
@@ -76,22 +50,47 @@ Style général pour l'export
 Masquer TOUJOURS certaines sections 
 ************************************************/
 
-/* Header avec encart bleu qui bug */
-.malt-to-cv-export .profile-wrapper__profile .profile-wrapper__profile-breadcrumb.freelancer .shapes.freelancer,
+/* Beadcrumb */
+.malt-to-cv-export nav[data-testid="profile-breadcrumb-wrapper"],
 
-/* Boutons cta */
-.malt-to-cv-export [class*="cta"],
+/* Boutons cta header */
+/* .malt-to-cv-export .profile-cta p.answer-time-indicator, */                                    /* Délai de réponse */
+/*.malt-to-cv-export .profile-cta button[data-testid="contact-button-project-proposal"],            /* Proposer un projet */
+/*.malt-to-cv-export .profile-cta button[data-testid="profile-instant-conversation-start-button"],  /* Engager la conversation */
+/*.malt-to-cv-export section.profile-header-section button#share-profile-button,                    /* Partager le profil */
+
+/* Bouton "afficher les détails des avis Malt */
+.malt-to-cv-export .overall-rating__toggle,
+.malt-to-cv-export button[data-testid="rating-details-toggle"],
+
+/* Bouton "trier les avis Malt" */
+.malt-to-cv-export .appraisal-section__sort-menu--desktop,
+.malt-to-cv-export .appraisal-sort-menu__dropdown.appraisal-section__sort-menu--mobile,
+
+/* Bouton "filtrer le portfolio" */
+.malt-to-cv-export button[data-testid="portfolio-filter-dropdown-trigger"],
+
+/* Bouton "N éléments du portfolio associés" (ouvre une modale) */
+.malt-to-cv-export button[data-testid="profile-experience-item-opens-portfolio-modal"],
+
+/* Portfolio : tag "expérience associée" de chaque projet */
+.malt-to-cv-export [data-testid="portfolio-item-card-associated-experience"],
 
 /* Navbar */
 .malt-to-cv-export #navbar-app,
 
-/* Sidebar > sections > margin-bottom*/
-.malt-to-cv-export .profile-wrapper__side-menu section .left-side-component__actions {
+/* Footer */
+.malt-to-cv-export footer,
+
+/* Cookie consent */
+.malt-to-cv-export #axeptio_overlay,
+.malt-to-cv-export .axeptio_widget {
   display: none !important;
 }
 
-/* Sidebar > sections > padding-bottom*/
-.malt-to-cv-export .profile-wrapper__side-menu section .left-side-component__content {
+/* Séparateur dans le header des avis Malt */
+.malt-to-cv-export .overall-rating__header {
+  border-bottom : none !important;
   padding-bottom: 0 !important;
 }
 
