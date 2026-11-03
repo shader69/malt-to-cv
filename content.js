@@ -68,6 +68,16 @@ async function generatePDF(options) {
   }
 }
 
+// Libellé des boutons déjà déployés : Malt n'expose aucun attribut (aria-expanded...),
+// seul le texte change ("Voir plus" / "Afficher les 6 expériences" -> "Voir moins")
+const COLLAPSE_LABEL_REGEX = /voir moins|réduire/i;
+
+// Un bouton déjà déployé (ex: 2e génération sur la même page) ne doit pas être recliqué :
+// ça replierait la section
+function isAlreadyExpanded(button) {
+  return COLLAPSE_LABEL_REGEX.test(button.textContent);
+}
+
 // Fonction générique pour déployer les sections selon les options
 // Se fait en plusieurs passes : déployer une liste ("Afficher les 6 expériences")
 // fait apparaître de nouveaux éléments, qui ont chacun leur propre bouton
@@ -102,7 +112,7 @@ async function expandSections(options) {
               } else {
                 button = container.querySelector('a, button');
               }
-              if (button && !alreadyClicked.has(button)) {
+              if (button && !alreadyClicked.has(button) && !isAlreadyExpanded(button)) {
                 alreadyClicked.add(button);
                 button.click();
                 clickCount++;
