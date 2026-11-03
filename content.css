@@ -2,12 +2,28 @@
 Style général pour l'export 
 ************************************************/
 
+/* Taille du texte dans le PDF : en impression, Chrome affiche la page sur ~1.33x la largeur du papier.
+   Le zoom réduit le contenu pour qu'il tienne exactement dans cette largeur, quel que soit le papier.
+   Plus la valeur est petite, plus le texte est petit et moins il y a de pages. */
 .malt-to-cv-export {
+  zoom: 0.77;
+  box-sizing: border-box !important;
+  margin: 0 !important;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
   line-height: 1.6 !important;
   color: #333 !important;
   background: white !important;
   padding: 20px !important;
+}
+
+/* Marges de la page imprimée  */
+@page {
+  margin: 10mm;
+}
+
+/* Malt centre le contenu dans une colonne de 1024px (~110px de blanc de chaque côté) : on l'élargit un peu */
+.malt-to-cv-export .profile-wrapper__layout {
+  max-width: 1120px !important;
 }
 
 /* .malt-to-cv-export h1, 
@@ -92,4 +108,58 @@ Masquer TOUJOURS certaines sections
 .malt-to-cv-export .overall-rating__header {
   border-bottom : none !important;
   padding-bottom: 0 !important;
+}
+
+/*********************************************
+Mise en page du CV
+************************************************/
+
+/* Portfolio : la grille a des colonnes de largeur fixe (304px) qui débordent de la page */
+.malt-to-cv-export .portfolio-filled-state__list {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+.malt-to-cv-export .portfolio-item-card {
+  width: 100% !important;
+}
+
+/* Influence + catégories : côte à côte au lieu de deux blocs pleine largeur.
+   Les autres sections restent sur toute la largeur. */
+.malt-to-cv-export .profile-wrapper__profile-main-content {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.malt-to-cv-export .profile-wrapper__profile-main-content > section {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+.malt-to-cv-export .profile-wrapper__profile-main-content > section[data-testid="profile-reputation"],
+.malt-to-cv-export .profile-wrapper__profile-main-content > section#categories-section {
+  grid-column: auto;
+}
+
+/* Un titre de section ne reste jamais seul en bas de page : il suit son contenu sur la page suivante */
+.malt-to-cv-export .joy-panel__header,
+.malt-to-cv-export .recommendation-authors {
+  break-after: avoid;
+}
+
+/* Les listes d'avis et de recommandations sont en flex : leurs éléments ne se coupent pas
+   entre deux pages, ce qui laisse de grands blancs. En bloc, ils se coupent normalement
+   (les espaces de 16px / 32px remplacent le "gap" du flex). */
+.malt-to-cv-export .appraisal-section__list,
+.malt-to-cv-export .recommendation-section__list {
+  display: block !important;
+}
+.malt-to-cv-export .appraisal-section__list > * {
+  margin-bottom: 16px;
+}
+.malt-to-cv-export .recommendation-section__list > * {
+  margin-bottom: 32px;
+}
+
+/* Éviter de couper une carte du portfolio entre deux pages
+   (à ne pas mettre sur les expériences / avis : ça laisse de grands trous et fait disparaître des blocs) */
+.malt-to-cv-export .portfolio-item-card {
+  break-inside: avoid;
 }
