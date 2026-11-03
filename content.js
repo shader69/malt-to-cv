@@ -33,6 +33,8 @@ async function generatePDF(options) {
   try {
     console.log('📄 Début de la génération PDF avec options:', options);
     
+    showLoader();
+    
     // Vérifier l'accessibilité du profil
     if (!isProfileAccessible()) {
       throw new Error('Profil non accessible ou restreint');
@@ -61,6 +63,7 @@ async function generatePDF(options) {
     
   } catch (error) {
     console.error('❌ Erreur lors de la génération PDF:', error);
+    hideLoader();
     chrome.runtime.sendMessage({ action: 'pdfError', error: error.message });
   }
 }
@@ -198,6 +201,33 @@ function applyHidingOptions(options) {
   renderDynamicStyle();
 }
 
+const LOADER_ID = 'malt-to-cv-loader';
+
+// Loader central avec flou d'arrière-plan pendant la préparation de la page
+// (les styles sont dans content.css)
+function showLoader() {
+  if (document.getElementById(LOADER_ID)) {
+    return;
+  }
+  
+  const loader = document.createElement('div');
+  loader.id = LOADER_ID;
+  loader.className = 'malt-to-cv-loader';
+  loader.setAttribute('role', 'status');
+  loader.innerHTML = `
+    <div class="malt-to-cv-loader__spinner"></div>
+    <div>Génération du PDF…</div>
+  `;
+  document.body.appendChild(loader);
+}
+
+function hideLoader() {
+  const loader = document.getElementById(LOADER_ID);
+  if (loader) {
+    loader.remove();
+  }
+}
+
 // Fonction pour appliquer le style CV
 function applyCVStyle() {
   // Ajouter la classe à la page pour activer les styles CSS
@@ -209,6 +239,9 @@ async function generatePDFWithChromePrint() {
   try {
     // Attendre un peu pour que les styles CSS s'appliquent
     await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Retirer le loader pour qu'il n'apparaisse pas dans le PDF
+    hideLoader();
     
     // Utiliser l'API d'impression de Chrome
     window.print();

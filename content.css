@@ -163,3 +163,45 @@ Mise en page du CV
 .malt-to-cv-export .portfolio-item-card {
   break-inside: avoid;
 }
+
+/*********************************************
+Loader pendant la génération du PDF
+************************************************/
+
+/* Voile flouté + spinner centré, affiché par content.js et retiré juste avant l'impression */
+.malt-to-cv-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.malt-to-cv-loader__spinner {
+  width: 48px;
+  height: 48px;
+  border: 5px solid rgba(102, 126, 234, 0.25);
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: malt-to-cv-spin 0.9s linear infinite;
+}
+
+@keyframes malt-to-cv-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media print {
+  .malt-to-cv-loader {
+    display: none !important;
+  }
+}
