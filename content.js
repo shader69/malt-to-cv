@@ -50,7 +50,7 @@ async function generatePDF(options) {
     applyHidingOptions(options);
     
     // Appliquer le style CV
-    applyCVStyle();
+    applyCVStyle(options.pdfZoom);
     
     // Attendre un peu pour que les styles s'appliquent
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -239,10 +239,17 @@ function hideLoader() {
   }
 }
 
+const ZOOM_CSS_VARIABLE = '--malt-to-cv-zoom';
+
 // Fonction pour appliquer le style CV
-function applyCVStyle() {
+function applyCVStyle(zoom) {
   // Ajouter la classe à la page pour activer les styles CSS
   document.body.classList.add('malt-to-cv-export');
+
+  // Taille du texte choisie dans le popup (sinon la valeur par défaut de content.css)
+  if (Number.isFinite(zoom)) {
+    document.body.style.setProperty(ZOOM_CSS_VARIABLE, zoom);
+  }
 }
 
 // Fonction pour générer le PDF avec l'API d'impression de Chrome
@@ -276,6 +283,7 @@ function cleanup() {
   
   // Retirer la classe d'export
   document.body.classList.remove('malt-to-cv-export');
+  document.body.style.removeProperty(ZOOM_CSS_VARIABLE);
   
   // Retirer les règles de masquage et la surbrillance
   dynamicState.exportOptions = null;

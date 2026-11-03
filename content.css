@@ -6,7 +6,7 @@ Style général pour l'export
    Le zoom réduit le contenu pour qu'il tienne exactement dans cette largeur, quel que soit le papier.
    Plus la valeur est petite, plus le texte est petit et moins il y a de pages. */
 .malt-to-cv-export {
-  zoom: 0.77;
+  zoom: var(--malt-to-cv-zoom, 0.77);
   box-sizing: border-box !important;
   margin: 0 !important;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;

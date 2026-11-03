@@ -96,6 +96,33 @@
       display: none;
     }
     
+    /* Curseur de taille du texte */
+    .zoom-group__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    
+    .zoom-group__value {
+      font-weight: normal;
+      color: var(--muted);
+    }
+    
+    .zoom-group input[type="range"] {
+      width: 100%;
+      margin: 0;
+      accent-color: var(--accent);
+    }
+    
+    .zoom-group__hint {
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    
     /* Pied de page */
     .footer {
       display: flex;
@@ -284,6 +311,7 @@
     /* Navigation au clavier */
     .generate-btn:focus-visible,
     .reset-btn:focus-visible,
+    .zoom-group input:focus-visible,
     .action-btn:focus-visible,
     .option-group summary:focus-visible,
     .checkbox-item input:focus-visible {

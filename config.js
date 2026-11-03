@@ -189,6 +189,9 @@ window.SECTIONS_CONFIG = [
   }
 ];
 
+// Taille du texte dans le PDF (zoom appliqué à la page pendant l'impression, plus petit = moins de pages)
+window.PDF_ZOOM = { default: 0.77, min: 0.5, max: 1, step: 0.01 };
+
 // Fonction utilitaire pour obtenir les options par défaut
 window.getDefaultOptions = function() {
   const defaults = {};
@@ -197,5 +200,6 @@ window.getDefaultOptions = function() {
       defaults[option.key] = option.defaultValue;
     });
   });
+  defaults.pdfZoom = PDF_ZOOM.default;
   return defaults;
 };

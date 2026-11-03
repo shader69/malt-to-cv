@@ -57,6 +57,39 @@ function generateInterface() {
     sectionDiv.appendChild(checkboxGroup);
     optionsContainer.appendChild(sectionDiv);
   });
+  
+  optionsContainer.appendChild(createZoomGroup());
+}
+
+// Curseur de taille du texte du PDF
+function createZoomGroup() {
+  const group = document.createElement('div');
+  group.className = 'option-group zoom-group';
+  group.innerHTML = `
+    <div class="zoom-group__header">
+      <label for="pdfZoom">🔎 Taille du texte</label>
+      <span id="pdfZoomValue" class="zoom-group__value"></span>
+    </div>
+    <input type="range" id="pdfZoom"
+           min="${PDF_ZOOM.min}" max="${PDF_ZOOM.max}" step="${PDF_ZOOM.step}">
+    <div class="zoom-group__hint">Plus petit = moins de pages</div>
+  `;
+
+  group.querySelector('#pdfZoom').addEventListener('input', (e) => {
+    options.pdfZoom = Number(e.target.value);
+    updateZoomUI();
+    saveOptions();
+  });
+
+  return group;
+}
+
+function updateZoomUI() {
+  const slider = document.getElementById('pdfZoom');
+  if (slider) {
+    slider.value = options.pdfZoom;
+    document.getElementById('pdfZoomValue').textContent = `${Math.round(options.pdfZoom * 100)} %`;
+  }
 }
 
 // Compteur "2 masqués · 1 déplié" affiché dans le titre des groupes repliés
@@ -166,6 +199,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateUI();
   }
   
+  updateZoomUI();
   updateGroupCounts();
   await restoreUiState();
   
@@ -193,6 +227,7 @@ function updateUI() {
   // Désactiver les options d'expansion si les sections sont masquées
   updateExpandOptions();
   
+  updateZoomUI();
   updateGroupCounts();
 }
 
