@@ -13,6 +13,8 @@ let generationTimeout = null;
 function generateInterface() {
   const optionsContainer = document.getElementById('optionsContainer');
   
+  optionsContainer.appendChild(createPresetsRow());
+  
   SECTIONS_CONFIG.forEach(section => {
     // Filtrer les options visibles (non cachées)
     const visibleOptions = section.options.filter(opt => !opt.hidden);
@@ -59,6 +61,38 @@ function generateInterface() {
   });
   
   optionsContainer.appendChild(createZoomGroup());
+}
+
+// Boutons de préréglages (définis dans PRESETS de config.js)
+function createPresetsRow() {
+  const row = document.createElement('div');
+  row.className = 'presets';
+
+  PRESETS.forEach(preset => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'preset-btn';
+    button.textContent = preset.title;
+    button.addEventListener('click', () => applyPreset(preset));
+    row.appendChild(button);
+  });
+
+  return row;
+}
+
+// Appliquer un préréglage : les options listées sont cochées, toutes les autres décochées
+function applyPreset(preset) {
+  SECTIONS_CONFIG.forEach(section => {
+    section.options.forEach(config => {
+      if (!config.hidden) {
+        options[config.key] = preset.selected.includes(config.key);
+      }
+    });
+  });
+
+  updateUI();
+  saveOptions();
+  updateHighlighting();
 }
 
 // Curseur de taille du texte du PDF

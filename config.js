@@ -189,6 +189,27 @@ window.SECTIONS_CONFIG = [
   }
 ];
 
+// Préréglages proposés en haut du popup.
+// "selected" liste les clés des options à cocher (masquage ou expansion) : toutes les autres
+// options sont décochées. Les options "hidden" ne sont jamais touchées.
+window.PRESETS = [
+  {
+    title: '💼 Version recruteur',
+    selected: [
+      'hideTJM', 'hideAnswerRate', 'hideAvailability', 'hideInfluence', 'hideCategories',
+      'expandPortfolio', 'expandExperiences', 'expandFormations', 'expandMaltReviews',
+      'expandRecommendations', 'expandOtherSkills'
+    ]
+  },
+  {
+    title: '👁️ Tout afficher',
+    selected: [
+      'expandPortfolio', 'expandExperiences', 'expandFormations', 'expandMaltReviews',
+      'expandRecommendations', 'expandOtherSkills'
+    ]
+  }
+];
+
 // Taille du texte dans le PDF (zoom appliqué à la page pendant l'impression, plus petit = moins de pages)
 window.PDF_ZOOM = { default: 0.77, min: 0.5, max: 1, step: 0.01 };
 

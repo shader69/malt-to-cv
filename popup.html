@@ -96,6 +96,31 @@
       display: none;
     }
     
+    /* Préréglages */
+    .presets {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    
+    .preset-btn {
+      flex: 1;
+      padding: 8px 6px;
+      background: transparent;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    
+    .preset-btn:hover {
+      background: var(--accent);
+      color: var(--bg);
+    }
+    
     /* Curseur de taille du texte */
     .zoom-group__header {
       display: flex;
@@ -310,6 +335,7 @@
     
     /* Navigation au clavier */
     .generate-btn:focus-visible,
+    .preset-btn:focus-visible,
     .reset-btn:focus-visible,
     .zoom-group input:focus-visible,
     .action-btn:focus-visible,
